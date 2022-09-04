@@ -15,7 +15,7 @@ library(dplyr)
 #######################################
 ## L# Data preparation for models ##
 #######################################
-
+data<-read.csv(...)
 set.seed(516) 
 smp.size = floor(0.7*nrow(data)) 
 train.ind = sample(seq_len(nrow(data)), smp.size)
@@ -27,7 +27,7 @@ testdata<-data[-train.ind, ]
 myTrainingControl <- trainControl(method = "cv", 
                                   number = 5,
                                   savePredictions = TRUE, 
-                                  #classProbs = TRUE, 
+                                  classProbs = TRUE, 
                                   verboseIter = FALSE)# Train RF
 ###################
 ## Random forest ##
@@ -42,13 +42,12 @@ fit_RF <- caret::train(CHD ~ .,
 print(fit_RF)
 # Prediction in test set
 pred_RF_prob <- predict(fit_RF, testdata) 
-hist(pred_RF_prob)
+
 
 
 ###################
 ## CACS ##
 ###################
-
 
 fit_glm <- caret::train(CHD ~CACS,   
                         data = traindata, 
@@ -59,9 +58,8 @@ fit_glm <- caret::train(CHD ~CACS,
                         trControl = myTrainingControl)
 print(fit_glm)
 # Prediction in test set
-pred_glm_prob1 <- predict(fit_glm, testdata, type="raw")
+pred_glm_prob1 <- predict(fit_glm, testdata, type="prob")
 
-hist(pred_glm_prob1)
 
 
 ###################
@@ -78,14 +76,13 @@ fit_glm2 <- caret::train(CHD~sex+Age+Diabetes+Hypertention+Current_smoker+Total_
                          trControl = myTrainingControl)
 print(fit_glm2)
 # Prediction in test set
-pred_glm_prob2 <- predict(fit_glm2, testdata, type="raw")
+pred_glm_prob2 <- predict(fit_glm2, testdata, type="prob")
 
-hist(pred_glm_prob2)
 
 ###################
 ## ROC ##
 ###################
-df<-cbind(testdata$CHD,pred_RF_prob,pred_glm_prob1,pred_glm_prob2)
+df<-cbind(testdata$CHD,pred_RF_prob$yes,pred_glm_prob1$yes,pred_glm_prob2$yes)
 
 mycol <- c('slateblue','seagreen3','dodgerblue','firebrick1','lightgoldenrod','magenta','orange2')
 x1<-plot.roc(df[,1],df[,2],
