@@ -53,8 +53,6 @@ fit_glm <- caret::train(CHD ~CACS,
                         data = traindata, 
                         method = "glm",
                         family = "binomial",
-                        tuneLength = 3,     
-                        #importance = "permutation",
                         trControl = myTrainingControl)
 print(fit_glm)
 # Prediction in test set
@@ -71,8 +69,6 @@ fit_glm2 <- caret::train(CHD~sex+Age+Diabetes+Hypertention+Current_smoker+Total_
                          data = traindata, 
                          method = "glm",
                          family = "binomial", 
-                         tuneLength = 3,     
-                         #importance = "permutation",
                          trControl = myTrainingControl)
 print(fit_glm2)
 # Prediction in test set
